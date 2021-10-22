@@ -1,0 +1,40 @@
+---
+title: "Experiment_1"
+author: "Marcela Morassi"
+date: "10/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggpubr)
+library(RColorBrewer)
+library(rcompanion)
+library(dplyr)
+library(ggplot2)
+library(ggforce)
+library(vegan)
+theme_set(theme_classic()) # Set the theme
+
+setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
+
+data1 <- read.csv("data_experiment1_j.csv")
+
+```
+
+
+Contingency Tables
+```{r}
+table_day7 <- data1 %>% 
+  group_by(genotype) %>% 
+  table()
+
+
+```
+
+
+
+
+
