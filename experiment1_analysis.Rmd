@@ -20,16 +20,53 @@ theme_set(theme_classic()) # Set the theme
 
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 
-data1 <- read.csv("data_experiment1_j.csv")
+data1 <- read.csv("data_experiment1_j_noNG.csv")
+data1_NG <- read.csv("data_experiment1_j.csv")
+
+```
+
+BarStats Function 
+```{r}
+#barGraphStats(data=, variable="", byFactorNames=c(""))
+barGraphStats <- function(data, variable, byFactorNames) {
+  count <- length(byFactorNames)
+  N <- aggregate(data[[variable]], data[byFactorNames], FUN=length)
+  names(N)[1:count] <- byFactorNames
+  names(N) <- sub("^x$", "N", names(N))
+  mean <- aggregate(data[[variable]], data[byFactorNames], FUN=mean)
+  names(mean)[1:count] <- byFactorNames
+  names(mean) <- sub("^x$", "mean", names(mean))
+  sd <- aggregate(data[[variable]], data[byFactorNames], FUN=sd)
+  names(sd)[1:count] <- byFactorNames
+  names(sd) <- sub("^x$", "sd", names(sd))
+  preSummaryStats <- merge(N, mean, by=byFactorNames)
+  finalSummaryStats <- merge(preSummaryStats, sd, by=byFactorNames)
+  finalSummaryStats$se <- finalSummaryStats$sd / sqrt(finalSummaryStats$N)
+  return(finalSummaryStats)
+}
 
 ```
 
 
-Contingency Tables
+Data Manipulation
 ```{r}
+data1 <- data1 %>%  
+  mutate(total_growth = day7_root - day3_root)
+
+data1$day3_datehour <- cut(as.POSIXct(paste(data1$day3_date, data1$day3_time),
+   format="%m/%d/%Y %H:%M:%S"), breaks="hour") 
+
 table_day7 <- data1 %>% 
   group_by(genotype) %>% 
   table()
+
+
+ggplot(data = barGraphStats(data = data1, variable = "day7_root", byFactorNames = c("ATP_conc")), 
+       aes(x = genotype, y = mean, fill = ATP_conc)) +
+    geom_bar(stat='identity', position=position_dodge()) +
+    xlab("Genotype") + ylab("Root Length") 
+
+
 
 
 ```
