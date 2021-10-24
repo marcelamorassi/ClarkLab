@@ -50,8 +50,28 @@ barGraphStats <- function(data, variable, byFactorNames) {
 
 Data Manipulation
 ```{r}
+data1[is.na(data1)] <- 0
+
+#crude growth rate mutations
 data1 <- data1 %>%  
-  mutate(total_growth = day7_root - day3_root)
+  mutate(total_growth = day7_root - day3_root) %>% 
+  mutate(growthrate1 = (day4_root - day3_root)/24.5) %>% 
+  mutate(growthrate2 = (day5_root - day4_root)/23) %>% 
+  mutate(growthrate3 = (day6_root - day5_root)/24.3) %>% 
+  mutate(growthrate4 = (day7_root - day6_root)/23) %>% 
+  mutate(mean_growthrate = (growthrate1 + growthrate2 + growthrate3 + growthrate4)/4)
+
+#combining date and time
+data1 %>% mutate(day3 = coalesce(day3_date, day3_time)) 
+
+
+#formatting as date
+data1$day3_date <- as.Date(data1$day3_date, "%m/%d/%Y")
+data1$day4_date <- as.Date(data1$day4_date, "%m/%d/%Y")
+data1$day5_date <- as.Date(data1$day5_date, "%m/%d/%Y")
+data1$day6_date <- as.Date(data1$day6_date, "%m/%d/%Y")
+data1$day7_date <- as.Date(data1$day7_date, "%m/%d/%Y") 
+
 
 data1$day3_datehour <- cut(as.POSIXct(paste(data1$day3_date, data1$day3_time),
    format="%m/%d/%Y %H:%M:%S"), breaks="hour") 
@@ -67,7 +87,42 @@ ggplot(data = barGraphStats(data = data1, variable = "day7_root", byFactorNames 
     xlab("Genotype") + ylab("Root Length") 
 
 
+```
 
+Significance tests
+```{r}
+library(reshape2)
+day7_table <- dcast(data1, genotype~ATP_conc, value.var='day7_root', mean)
+
+day7_tableKO <- data1 %>% filter(genotype == "KO") %>% 
+  with(tapply(day7_root, list(genotype, ATP_conc), mean))
+day7_tableKO
+
+chisq.test(day7_tableKO)
+
+day7_tableWT <- data1 %>% filter(genotype == "WT") %>% 
+  with(tapply(day7_root, list(genotype, ATP_conc), mean))
+day7_tableWT
+
+chisq.test(day7_tableWT)
+
+table_growthrate_WT <- data1 %>% filter(genotype == "WT") %>% 
+  with(tapply(mean_growthrate, list(genotype, ATP_conc), mean))
+
+chisq.test(table_growthrate_WT)
+
+```
+
+
+
+Data visualization
+```{r}
+
+#growth rate bar graph
+ggplot(data1, aes(x = genotype, y = mean_growthrate, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
+
+#day7 root length bar graph
+ggplot(day7_table, aes(x = genotype, y = day7_root, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
 
 ```
 
