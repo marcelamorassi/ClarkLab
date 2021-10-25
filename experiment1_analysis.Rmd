@@ -23,6 +23,7 @@ setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 data1 <- read.csv("data_experiment1_j_noNG.csv")
 data1_NG <- read.csv("data_experiment1_j.csv")
 
+data2 <- read.csv("data_experiment1_m_noNG.csv")
 ```
 
 BarStats Function 
@@ -61,6 +62,14 @@ data1 <- data1 %>%
   mutate(growthrate4 = (day7_root - day6_root)/23) %>% 
   mutate(mean_growthrate = (growthrate1 + growthrate2 + growthrate3 + growthrate4)/4)
 
+data2 <- data2 %>%  
+  mutate(total_growth = day7_root - day3_root) %>% 
+  mutate(growthrate1 = (day4_root - day3_root)/24.5) %>% 
+  mutate(growthrate2 = (day5_root - day4_root)/23) %>% 
+  mutate(growthrate3 = (day6_root - day5_root)/24.3) %>% 
+  mutate(growthrate4 = (day7_root - day6_root)/23) %>% 
+  mutate(mean_growthrate = (growthrate1 + growthrate2 + growthrate3 + growthrate4)/4)
+
 #combining date and time
 data1 %>% mutate(day3 = coalesce(day3_date, day3_time)) 
 
@@ -76,50 +85,88 @@ data1$day7_date <- as.Date(data1$day7_date, "%m/%d/%Y")
 data1$day3_datehour <- cut(as.POSIXct(paste(data1$day3_date, data1$day3_time),
    format="%m/%d/%Y %H:%M:%S"), breaks="hour") 
 
-table_day7 <- data1 %>% 
-  group_by(genotype) %>% 
-  table()
-
-
-ggplot(data = barGraphStats(data = data1, variable = "day7_root", byFactorNames = c("ATP_conc")), 
-       aes(x = genotype, y = mean, fill = ATP_conc)) +
-    geom_bar(stat='identity', position=position_dodge()) +
-    xlab("Genotype") + ylab("Root Length") 
-
 
 ```
 
-Significance tests
+Significance tests (j)
 ```{r}
 library(reshape2)
 day7_table <- dcast(data1, genotype~ATP_conc, value.var='day7_root', mean)
 
-day7_tableKO <- data1 %>% filter(genotype == "KO") %>% 
-  with(tapply(day7_root, list(genotype, ATP_conc), mean))
+xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1,mean))
+
+#day7 root length
+data1_KO <- data1 %>% filter(genotype == "KO")
+day7_tableKO <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1_KO,mean))
 day7_tableKO
 
 chisq.test(day7_tableKO)
 
-day7_tableWT <- data1 %>% filter(genotype == "WT") %>% 
-  with(tapply(day7_root, list(genotype, ATP_conc), mean))
+data1_WT <- data1 %>% filter(genotype == "WT")
+day7_tableWT <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1_WT,mean))
 day7_tableWT
 
 chisq.test(day7_tableWT)
 
-table_growthrate_WT <- data1 %>% filter(genotype == "WT") %>% 
-  with(tapply(mean_growthrate, list(genotype, ATP_conc), mean))
+#growth rate
+data1_WT_nozero <- data1 %>% filter(genotype == "WT", mean_growthrate > 0)
+growthrate_tableWT <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_WT_nozero,mean))
 
-chisq.test(table_growthrate_WT)
+chisq.test(growthrate_tableWT)
+
+data1_KO_nozero <- data1 %>% filter(genotype == "KO", mean_growthrate > 0)
+growthrate_tableKO <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_KO_nozero,mean))
+
+chisq.test(growthrate_tableKO)
+
 
 ```
 
+
+Significance tests (m)
+```{r}
+
+#day7 root length
+data2_KO <- data2 %>% filter(genotype == "KO", day7_root >0)
+day7_tableKO_m <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data2_KO,mean))
+day7_tableKO_m
+
+chisq.test(day7_tableKO_m)
+
+data2_WT <- data2 %>% filter(genotype == "WT", day7_root >0)
+day7_tableWT_m <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data2_WT,mean))
+day7_tableWT_m
+
+chisq.test(day7_tableWT_m)
+
+#growth rate
+data1_WT_nozero <- data1 %>% filter(genotype == "WT", mean_growthrate > 0)
+growthrate_tableWT <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_WT_nozero,mean))
+
+chisq.test(growthrate_tableWT)
+
+data1_KO_nozero <- data1 %>% filter(genotype == "KO", mean_growthrate > 0)
+growthrate_tableKO <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_KO_nozero,mean))
+
+chisq.test(growthrate_tableKO)
+
+
+```
 
 
 Data visualization
 ```{r}
 
 #growth rate bar graph
-ggplot(data1, aes(x = genotype, y = mean_growthrate, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
+data1 %>% filter(mean_growthrate > 0) %>%  
+  ggplot(aes(x = genotype, y = mean_growthrate, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
+
+ggsave("growthrate_j.png")
+
+data2 %>%  filter (mean_growthrate > 0) %>% 
+  ggplot(aes(x = genotype, y = mean_growthrate, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
+
+ggsave("growthrate_m.png")
 
 #day7 root length bar graph
 ggplot(day7_table, aes(x = genotype, y = day7_root, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())

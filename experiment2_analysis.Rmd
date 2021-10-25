@@ -1,0 +1,50 @@
+---
+title: "experiment2_analysis"
+author: "Marcela Morassi"
+date: "10/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggpubr)
+library(RColorBrewer)
+library(rcompanion)
+library(dplyr)
+library(ggplot2)
+library(ggforce)
+library(vegan)
+theme_set(theme_classic()) # Set the theme
+
+setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
+
+data2_j <- read.csv("data_experiment2_j_noNG.csv")
+
+```
+
+
+Data Manipulation
+```{r}
+
+#crude growth rate mutations
+data2_j <- data2_j %>%  
+  mutate(total_growth = day7_root - day3_root) %>% 
+  mutate(growthrate1 = (day4_root - day3_root)/24) %>% 
+  mutate(growthrate2 = (day5_root - day4_root)/24) %>% 
+  mutate(growthrate3 = (day6_root - day5_root)/24) %>% 
+  mutate(growthrate4 = (day7_root - day6_root)/24.75) %>% 
+  mutate(mean_growthrate = (growthrate1 + growthrate2 + growthrate3 + growthrate4)/4)
+```
+
+Data Visualization
+```{r}
+#growth rate bar graph
+data2_j %>% filter(mean_growthrate > 0) %>%  
+  ggplot(aes(x = genotype, y = mean_growthrate, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
+
+ggsave("exp2_growthrate_j.png")
+
+
+```
+
