@@ -23,6 +23,17 @@ data2_j <- read.csv("data_experiment2_j_noNG.csv")
 
 ```
 
+Amy's working directory and file setup
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/hrusk/Dropbox (Smithsonian)/2021_SummerInterns/MM")
+setwd("C:/Users/hrusk/Dropbox (Smithsonian)/2021_SummerInterns/MM")
+
+data2_j <- read.csv("data_experiment2_j_noNG.csv")
+
+```
+
+
 
 Data Manipulation
 ```{r}
