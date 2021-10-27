@@ -100,24 +100,24 @@ data1_KO <- data1 %>% filter(genotype == "KO")
 day7_tableKO <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1_KO,mean))
 day7_tableKO
 
-chisq.test(day7_tableKO)
+t.test(day7_tableKO)
 
 data1_WT <- data1 %>% filter(genotype == "WT")
 day7_tableWT <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1_WT,mean))
 day7_tableWT
 
-chisq.test(day7_tableWT)
+t.test(day7_tableWT)
 
 #growth rate
 data1_WT_nozero <- data1 %>% filter(genotype == "WT", mean_growthrate > 0)
 growthrate_tableWT <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_WT_nozero,mean))
 
-chisq.test(growthrate_tableWT)
+t.test(growthrate_tableWT)
 
 data1_KO_nozero <- data1 %>% filter(genotype == "KO", mean_growthrate > 0)
 growthrate_tableKO <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_KO_nozero,mean))
 
-chisq.test(growthrate_tableKO)
+t.test(growthrate_tableKO)
 
 
 ```
@@ -131,24 +131,24 @@ data2_KO <- data2 %>% filter(genotype == "KO", day7_root >0)
 day7_tableKO_m <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data2_KO,mean))
 day7_tableKO_m
 
-chisq.test(day7_tableKO_m)
+t.test(day7_tableKO_m)
 
 data2_WT <- data2 %>% filter(genotype == "WT", day7_root >0)
 day7_tableWT_m <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data2_WT,mean))
 day7_tableWT_m
 
-chisq.test(day7_tableWT_m)
+t.test(day7_tableWT_m)
 
 #growth rate
 data1_WT_nozero <- data1 %>% filter(genotype == "WT", mean_growthrate > 0)
 growthrate_tableWT <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_WT_nozero,mean))
 
-chisq.test(growthrate_tableWT)
+t.test(growthrate_tableWT)
 
 data1_KO_nozero <- data1 %>% filter(genotype == "KO", mean_growthrate > 0)
 growthrate_tableKO <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_KO_nozero,mean))
 
-chisq.test(growthrate_tableKO)
+t.test(growthrate_tableKO)
 
 
 ```
@@ -173,6 +173,16 @@ ggplot(day7_table, aes(x = genotype, y = day7_root, fill = ATP_conc, group = fac
 
 ```
 
+
+Data Summary
+```{r}
+sd(data2_KO %>% select(genotype, ATP_conc, day7_root, mean_growthrate) %>% filter(mean_growthrate>0, ATP_conc == 7.5))
+
+data2_WT %>% select(genotype, ATP_conc, day7_root, mean_growthrate) %>% filter(mean_growthrate>0, ATP_conc == 7.5) %>% summary()
+
+data1_WT %>% select(genotype, ATP_conc, day7_root, mean_growthrate) %>% filter(mean_growthrate>0, ATP_conc == 137.5) %>% summary()
+
+```
 
 
 
