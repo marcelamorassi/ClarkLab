@@ -26,6 +26,20 @@ data1_NG <- read.csv("data_experiment1_j.csv")
 data2 <- read.csv("data_experiment1_m_noNG.csv")
 ```
 
+Amy's set up
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/hrusk/Dropbox (Smithsonian)/2021_SummerInterns/MM")
+setwd("C:/Users/hrusk/Dropbox (Smithsonian)/2021_SummerInterns/MM")
+
+data1 <- read.csv("data_experiment1_j_noNG.csv")
+data1_NG <- read.csv("data_experiment1_j.csv")
+data2 <- read.csv("data_experiment1_m_noNG.csv")
+
+```
+
+
+
 BarStats Function 
 ```{r}
 #barGraphStats(data=, variable="", byFactorNames=c(""))
@@ -87,6 +101,16 @@ data1$day3_datehour <- cut(as.POSIXct(paste(data1$day3_date, data1$day3_time),
 
 
 ```
+
+Scatterplots
+```{r}
+
+
+```
+
+
+
+
 
 Significance tests (j)
 ```{r}
