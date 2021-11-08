@@ -20,6 +20,7 @@ theme_set(theme_classic()) # Set the theme
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 
 data2_j <- read.csv("data_experiment2_j_noNG.csv")
+data3_j <- read.csv("data3.csv")
 
 ```
 
@@ -47,4 +48,16 @@ ggsave("exp2_growthrate_j.png")
 
 
 ```
+
+Data Summary
+```{r}
+data2_j %>% select(genotype, ATP_conc, day7_root, mean_growthrate) %>% filter(mean_growthrate>0, ATP_conc == 0, genotype == "WT") %>% sd()
+
+data3_j %>% select(genotype, ATP_conc, day7_root) %>% filter(ATP_conc == 10, day7_root>0) %>% summary()
+
+
+```
+
+
+
 

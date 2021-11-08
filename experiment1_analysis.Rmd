@@ -75,7 +75,7 @@ data1 %>% mutate(day3 = coalesce(day3_date, day3_time))
 
 
 #formatting as date
-data1$day3_date <- as.Date(data1$day3_date, "%m/%d/%Y")
+data1$day3_date <- as.Date(data1$day3_date, "%m/%d/%Y %H:%M")
 data1$day4_date <- as.Date(data1$day4_date, "%m/%d/%Y")
 data1$day5_date <- as.Date(data1$day5_date, "%m/%d/%Y")
 data1$day6_date <- as.Date(data1$day6_date, "%m/%d/%Y")
@@ -96,11 +96,11 @@ day7_table <- dcast(data1, genotype~ATP_conc, value.var='day7_root', mean)
 xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1,mean))
 
 #day7 root length
-data1_KO <- data1 %>% filter(genotype == "KO")
+data1_KO <- data1 %>% filter(genotype == "KO") %>% select(genotype, ATP_conc, day7_root)
 day7_tableKO <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1_KO,mean))
 day7_tableKO
 
-t.test(day7_tableKO)
+t.test(data1_KO)
 
 data1_WT <- data1 %>% filter(genotype == "WT")
 day7_tableWT <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data1_WT,mean))
