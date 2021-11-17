@@ -19,7 +19,7 @@ theme_set(theme_classic()) # Set the theme
 
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 
-data2_j <- read.csv("data_experiment2_j_noNG.csv")
+data2_j <- read.csv("exp2_j.csv")
 data3_j <- read.csv("data3.csv")
 
 ```
@@ -39,24 +39,37 @@ data2_j <- read.csv("data_experiment2_j_noNG.csv")
 Data Manipulation
 ```{r}
 
-#crude growth rate mutations
-data2_j <- data2_j %>%  
-  mutate(total_growth = day7_root - day3_root) %>% 
-  mutate(growthrate1 = (day4_root - day3_root)/24) %>% 
-  mutate(growthrate2 = (day5_root - day4_root)/24) %>% 
-  mutate(growthrate3 = (day6_root - day5_root)/24) %>% 
-  mutate(growthrate4 = (day7_root - day6_root)/24.75) %>% 
-  mutate(mean_growthrate = (growthrate1 + growthrate2 + growthrate3 + growthrate4)/4)
+data2j_KO_control <- data2_j %>% filter(genotype == "KO", day ==7, root>0, ATP_conc ==0)
+data2j_KO_treatment <- data2_j %>% filter(genotype == "KO", day==7, root>0, ATP_conc >0)
+data2j_WT_control <- data2_j %>% filter(genotype == "WT", day==7, root>0, ATP_conc ==0)
+data2j_WT_treatment <- data2_j %>% filter(genotype == "WT", day==7, root>0, ATP_conc >0)
+
+data2_KO_control <- data2 %>% filter(genotype == "KO", day ==7, root>0, ATP_conc ==0)
+data2_KO_treatment <- data2 %>% filter(genotype == "KO", day==7, root>0, ATP_conc >0)
+data2_WT_control <- data2 %>% filter(genotype == "WT", day==7, root>0, ATP_conc ==0)
+data2_WT_treatment <- data2 %>% filter(genotype == "WT", day==7, root>0, ATP_conc >0)
+
 ```
 
-Data Visualization
+Std Error Calcs
 ```{r}
-#growth rate bar graph
-data2_j %>% filter(mean_growthrate > 0) %>%  
-  ggplot(aes(x = genotype, y = mean_growthrate, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge())
+#KO control jei
+sd(data2j_KO_control$root)/sqrt(length(data2j_KO_control$root))
+#KO treatment 
+sd(data2j_KO_treatment$root)/sqrt(length(data2j_KO_treatment$root))
+#WT control
+sd(data2j_WT_control$root)/sqrt(length(data2j_WT_control$root))
+#WT treatment 
+sd(data2j_WT_treatment$root)/sqrt(length(data2j_WT_treatment$root))
 
-ggsave("exp2_growthrate_j.png")
-
+#KO control exp2
+sd(data2_KO_control$root)/sqrt(length(data2_KO_control$root))
+#KO treatment exp 2
+sd(data2_KO_treatment$root)/sqrt(length(data2_KO_treatment$root))
+#WT control exp 2
+sd(data2_WT_control$root)/sqrt(length(data2_WT_control$root))
+#WT treatment exp 2
+sd(data2_WT_treatment$root)/sqrt(length(data2_WT_treatment$root))
 
 ```
 
