@@ -16,10 +16,11 @@ library(dplyr)
 library(ggplot2)
 library(ggforce)
 library(vegan)
-library(arules)
 theme_set(theme_classic()) # Set the theme
 
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
+#working on campus
+setwd("C:/Users/mm92384/Downloads/ClarkLab-master/ClarkLab-master")
 
 data1 <- read.csv("data_experiment1_j_noNG.csv")
 data1_new <- read.csv("experiment1_j_new.csv")
@@ -68,6 +69,17 @@ Data Manipulation
 ```{r}
 data1[is.na(data1)] <- 0
 
+#turning data discrete
+data1_new <- data1_new %>% 
+  mutate(ATP_conc = as.character(ATP_conc)) %>% 
+  filter(root>0)
+
+#SE
+SE <- data1_new %>% 
+  group_by(genotype, ATP_conc) %>% 
+  filter(day==7) %>% 
+  summarise(mean_root = mean(root), se = sd(root)  / sqrt(n()))
+
 #formatting as date
 as.Date(data1_new$date_time, "%m/%d/%Y %H:%M")
 
@@ -91,43 +103,12 @@ data2_WT_treatment <- data2 %>% filter(genotype == "WT", day==7, root>0, ATP_con
 Growth Rate
 ```{r}
 data1_new %>% 
-  filter(geno_dummy == 0, root>0) %>% 
-  ggplot(aes(x=date_time, y = root, color=ATP_dummy)) +
-  geom_point()+
-  geom_line(aes(group = ATP_dummy)) 
+  filter(genotype == "WT") %>% 
+  ggplot(aes(x=day_date, y = root, color=ATP_conc)) +
+  geom_point()
 
 
 ```
-
-Std Error Calcs
-```{r}
-#KO control exp1 jei
-se1 <- sd(data1_KO_control$root)/sqrt(length(data1_KO_control$root))
-#KO treatment exp 1
-se2 <- sd(data1_KO_treatment$root)/sqrt(length(data1_KO_treatment$root))
-#WT control exp 1
-se3 <- sd(data1_WT_control$root)/sqrt(length(data1_WT_control$root))
-#WT treatment exp 1
-se4 <- sd(data1_WT_treatment$root)/sqrt(length(data1_WT_treatment$root))
-
-#KO control marcela
-se5 <- sd(data2_KO_control$root)/sqrt(length(data2_KO_control$root))
-#KO treatment 
-se6 <- sd(data2_KO_treatment$root)/sqrt(length(data2_KO_treatment$root))
-#WT control 
-se7 <- sd(data2_WT_control$root)/sqrt(length(data2_WT_control$root))
-#WT treatment 
-se8 <- sd(data2_WT_treatment$root)/sqrt(length(data2_WT_treatment$root))
-
-data1_summary <- data1_new %>% filter(root > 0) %>% 
-  aggregate(root ~ ATP_conc,       # Create summary data
-                          function(x) c(mean = mean(x),
-                                        se = sd(x) / sqrt(length(x))))
-data_summary <- data.frame(group = data_summary[ , 1], data_summary$values)
-data_summary
-
-```
-
 
 
 
@@ -135,15 +116,11 @@ Significance tests (j)
 ```{r}
 
 #day7 root length
+exp1_day7 <- data1_new %>% 
+  filter(day==7)
 
-
-t.test(root ~ ATP_conc, var.equal=TRUE, data = data1_KO)
-
-
-
-
-t.test(day7_tableWT)
-
+t.test(root ~ ATP_conc, genotype == "WT", data = exp1_day7, var.equal=FALSE, conf.level=0.95)
+ 
 #growth rate
 data1_WT_nozero <- data1 %>% filter(genotype == "WT", mean_growthrate > 0)
 growthrate_tableWT <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_WT_nozero,mean))
@@ -154,14 +131,6 @@ data1_KO_nozero <- data1 %>% filter(genotype == "KO", mean_growthrate > 0)
 growthrate_tableKO <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_KO_nozero,mean))
 
 t.test(growthrate_tableKO)
-
-
-```
-
-
-Significance tests (NEW) (j)
-```{r}
-
 
 
 ```
@@ -170,29 +139,6 @@ Significance tests (NEW) (j)
 Significance tests (m)
 ```{r}
 
-#day7 root length
-data2_KO <- data2 %>% filter(genotype == "KO", day7_root >0)
-day7_tableKO_m <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data2_KO,mean))
-day7_tableKO_m
-
-t.test(day7_tableKO_m)
-
-data2_WT <- data2 %>% filter(genotype == "WT", day7_root >0)
-day7_tableWT_m <- xtabs(day7_root~genotype+ATP_conc,aggregate(day7_root~genotype+ATP_conc,data2_WT,mean))
-day7_tableWT_m
-
-t.test(day7_tableWT_m)
-
-#growth rate
-data1_WT_nozero <- data1 %>% filter(genotype == "WT", mean_growthrate > 0)
-growthrate_tableWT <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_WT_nozero,mean))
-
-t.test(growthrate_tableWT)
-
-data1_KO_nozero <- data1 %>% filter(genotype == "KO", mean_growthrate > 0)
-growthrate_tableKO <- xtabs(mean_growthrate~genotype+ATP_conc,aggregate(mean_growthrate~genotype+ATP_conc,data1_KO_nozero,mean))
-
-t.test(growthrate_tableKO)
 
 
 ```
@@ -216,9 +162,9 @@ ggsave("growthrate_m.png")
 data1_j_day7 <- data1_new %>% filter(day == 7)
 data1_j_day7$genotype <- factor(data1_j_day7$genotype)
 
-data1_new %>% filter(day == 7) %>%  ggplot(aes(x = genotype, y = root, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge()) +
-  geom_errorbar(aes(ymin=root-se, ymax=root+se),
-                  width=.2,                    # Width of the error bars
+ggplot(SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor (ATP_conc))) +
+  geom_col(stat="identity", position = position_dodge())+
+  geom_linerange( aes(ymin = mean_root - se, ymax = mean_root + se),  width=.2,                    # Width of the error bars
                   position=position_dodge(.9))
 
 data1_new %>% filter(day == 7) %>%  ggplot(aes(x = genotype, y = root, fill = ATP_conc, group = factor (ATP_conc))) + geom_bar(stat="identity", position = position_dodge()) +
