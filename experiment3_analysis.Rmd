@@ -1,0 +1,56 @@
+---
+title: "experiment3_analysis"
+author: "Marcela Morassi"
+date: "11/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggpubr)
+library(RColorBrewer)
+library(rcompanion)
+library(dplyr)
+library(ggplot2)
+library(ggforce)
+library(vegan)
+theme_set(theme_classic()) # Set the theme
+
+setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
+
+data3_j <- read.csv("data_experiment3_j.csv")
+
+```
+
+Data Manipulation
+```{r}
+
+data3j_KO_control <- data3_j %>% filter(genotype == "KO", day ==7, root>0, ATP_conc ==0)
+data3j_KO_treatment <- data3_j %>% filter(genotype == "KO", day==7, root>0, ATP_conc >0)
+data3j_WT_control <- data3_j %>% filter(genotype == "WT", day==7, root>0, ATP_conc ==0)
+data3j_WT_treatment <- data3_j %>% filter(genotype == "WT", day==7, root>0, ATP_conc >0)
+
+
+```
+
+Std Error Calcs
+```{r}
+#turning data discrete
+data3_j <- data3_j %>% 
+  mutate(ATP_conc = as.character(ATP_conc)) %>% 
+  filter(day7_root>0) %>% 
+  mutate(genotype = factor(genotype, levels = c("WT", "KO")))
+
+exp1_m <- exp1_m %>% 
+  mutate(ATP_conc = as.character(ATP_conc)) %>% 
+  filter(root>0) %>% 
+  mutate(genotype = factor(genotype, levels = c("WT", "KO")))
+
+#SE
+exp3j_SE <- data3_j %>% 
+  group_by(genotype, ATP_conc) %>% 
+  summarise(mean_root = mean(day7_root), se = sd(day7_root)  / sqrt(n()), .groups = "drop")
+```
+
+

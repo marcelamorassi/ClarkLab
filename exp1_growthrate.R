@@ -1,4 +1,3 @@
-library(lubridate)
 nested_data = data1_new %>% 
   mutate(real_date = as.Date(day_date, "%m/%d/%Y %H:%M")) %>% 
   as_tibble() %>% 
@@ -6,7 +5,7 @@ nested_data = data1_new %>%
   group_by(full_id, genotype, ATP_conc) %>% 
   arrange(full_id, real_date) %>% 
   select(-plate_id, -seedling) %>% 
-  # nest collapses each tree's data into a seprate data frame
+  # nest collapses each seedling's data into a separate data frame
   nest()
 nested_data %>% unnest(data) %>% 
   ggplot(aes(x = real_date, y = root, group = full_id)) + 
