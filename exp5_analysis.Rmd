@@ -1,0 +1,74 @@
+---
+title: "exp5_analysis"
+author: "Marcela Morassi"
+date: "12/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggpubr)
+library(dplyr)
+library(ggplot2)
+library(vegan)
+library(RColorBrewer)
+theme_set(theme_classic()) # Set the theme
+
+setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
+
+
+exp5_m <- read.csv("data_exp5_m.csv")
+```
+
+Data Manipulation
+```{r}
+#turning data discrete
+exp5_m <- exp5_m %>% 
+  mutate(ATP_conc = as.character(ATP_conc)) %>% 
+  filter(day==7, root>0) %>% 
+  mutate(genotype = factor(genotype, levels = c("WT", "KO")))
+
+
+#SE
+exp5_m_SE <- exp5_m %>% 
+  group_by(genotype, ATP_conc) %>% 
+  summarise(mean_root = mean(root), se = sd(root)  / sqrt(n()))
+```
+
+t-tests
+```{r}
+#Marcela final root length
+#WT control vs. 137.5
+t.test(root ~ ATP_conc, genotype=="WT", data = exp5_m, var.equal=FALSE, conf.level=0.95)
+#KO control vs. 137.5
+t.test(root ~ ATP_conc, genotype=="KO", data = exp5_m, var.equal=FALSE, conf.level=0.95)
+#WT v KO control
+t.test(root ~ genotype, ATP_conc == "0", data = exp5_m, var.equal=FALSE, conf.level=0.95)
+
+exp5_m %>% 
+  select(root, ATP_conc, genotype) %>% 
+  filter(ATP_conc=="0", genotype == "KO") %>% 
+  summary()
+
+
+```
+
+Data Visualization
+```{r}
+
+
+##Final root length
+#Marcela
+ggplot(exp5_m_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +
+  geom_col(stat="identity", position = position_dodge())+
+  xlab("")+ylab("average root length (mm)")+
+  scale_x_discrete(labels = c("WT", expression(italic("dorn1-1"))))+
+  geom_linerange( aes(ymin = mean_root - se, ymax = mean_root + se),  width=.2,
+                  position=position_dodge(.9))+
+  scale_fill_brewer(palette = "Pastel2", name = "", labels=c("0 µM ATP", "137.5 µM ATP"))
+ggsave("exp5_m_finalgrowth.png")
+```
+
+
+

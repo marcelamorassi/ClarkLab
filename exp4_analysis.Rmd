@@ -42,27 +42,37 @@ t-tests
 ```{r}
 #Marcela final root length
 #control v 2.5
-exp4_m %>% filter(ATP_conc == 0| ATP_conc ==2.5)
-  t.test(root ~ ATP_conc, ATP_conc == 0| ATP_conc ==2.5, data = exp4_m, var.equal=FALSE, conf.level=0.95)
+t.test(root ~ ATP_conc, ATP_conc == 0| ATP_conc ==2.5, data = exp4_m, var.equal=FALSE, conf.level=0.95)
 #control v 5
-t.test(root ~ ATP_conc == 0 | ATP_conc == 5, genotype == "WT", data = exp4_m, var.equal=FALSE, conf.level=0.95)
+t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc == 5, data = exp4_m, var.equal=FALSE, conf.level=0.95)
 #control v 7.5
 t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc == 7.5, data = exp4_m, var.equal=FALSE, conf.level=0.95)
+#control v 10
+t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc == 10, data = exp4_m, var.equal=FALSE, conf.level=0.95)
 
+exp4_m %>% 
+  select(root, ATP_conc) %>% 
+  filter(ATP_conc=="10") %>% 
+  summary()
 
-?t.test
 
 ```
 
 Data Visualization
 ```{r}
-palette = brewer.pal(11,'RdYlBu')
+
+
 ##Final root length
 #Marcela
 ggplot(exp4_m_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +
   geom_col(stat="identity", position = position_dodge())+
+  xlab("")+ylab("average root length (mm)")+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
   geom_linerange( aes(ymin = mean_root - se, ymax = mean_root + se),  width=.2,
                   position=position_dodge(.9))+
-  scale_fill_brewer(palette = "Pastel2")
+  scale_fill_brewer(palette = "Pastel2", name = "", labels=c("0 µM ATPƴS", "2.5 µM ATPƴS","5 µM ATPƴS",
+                                                             "7.5 µM ATPƴS","10 µM ATPƴS"))
+ggsave("exp4_m_finalgrowth.png")
 ```
 
