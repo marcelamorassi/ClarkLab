@@ -44,9 +44,9 @@ t.test(root ~ ATP_conc, genotype=="WT", data = exp6_m, var.equal=FALSE, conf.lev
 #KO control vs. 137.5
 t.test(root ~ ATP_conc, genotype=="KO", data = exp5_m, var.equal=FALSE, conf.level=0.95)
 
-exp4_m %>% 
+exp6_m %>% 
   select(root, ATP_conc) %>% 
-  filter(ATP_conc=="10") %>% 
+  filter(ATP_conc=="137.5") %>% 
   summary()
 
 
