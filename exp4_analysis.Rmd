@@ -49,6 +49,8 @@ t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc == 5, data = exp4_m, var.equal=
 t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc == 7.5, data = exp4_m, var.equal=FALSE, conf.level=0.95)
 #control v 10
 t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc == 10, data = exp4_m, var.equal=FALSE, conf.level=0.95)
+#2.5 v 10
+t.test(root ~ ATP_conc, ATP_conc == 2.5 | ATP_conc == 10, data = exp4_m, var.equal=FALSE, conf.level=0.95)
 
 exp4_m %>% 
   select(root, ATP_conc) %>% 
@@ -71,8 +73,8 @@ ggplot(exp4_m_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = fact
         axis.ticks.x=element_blank())+
   geom_linerange( aes(ymin = mean_root - se, ymax = mean_root + se),  width=.2,
                   position=position_dodge(.9))+
-  scale_fill_brewer(palette = "Pastel2", name = "", labels=c("0 µM ATPƴS", "2.5 µM ATPƴS","5 µM ATPƴS",
-                                                             "7.5 µM ATPƴS","10 µM ATPƴS"))
+  scale_fill_brewer(palette = "Pastel2", name = "[ATPƴS] (µM)", labels=c("Control", "2.5","5",
+                                                             "7.5","10"))
 ggsave("exp4_m_finalgrowth.png")
 ```
 

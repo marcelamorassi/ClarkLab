@@ -18,7 +18,7 @@ theme_set(theme_classic()) # Set the theme
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 
 
-exp6_m <- read.csv("data_exp6_m.csv")
+exp6_m <- read.csv("exp6_data.csv")
 ```
 
 Data Manipulation
@@ -42,11 +42,14 @@ t-tests
 #WT control vs. 137.5
 t.test(root ~ ATP_conc, genotype=="WT", data = exp6_m, var.equal=FALSE, conf.level=0.95)
 #KO control vs. 137.5
-t.test(root ~ ATP_conc, genotype=="KO", data = exp5_m, var.equal=FALSE, conf.level=0.95)
-
+t.test(root ~ ATP_conc, genotype=="KO", data = exp6_m, var.equal=FALSE, conf.level=0.95)
+#t = 1.6881, df = 38.557, p-value = 0.09946
+#WT control v KO control
+t.test(root ~ genotype, ATP_conc == "0", data = exp6_m, var.equal=FALSE, conf.level=0.95)
+# = 5.7411, df = 58.698, p-value = 3.512e-07
 exp6_m %>% 
-  select(root, ATP_conc) %>% 
-  filter(ATP_conc=="137.5") %>% 
+  select(root, ATP_conc, genotype) %>% 
+  filter(ATP_conc=="0", genotype == "KO") %>% 
   summary()
 
 
@@ -64,7 +67,7 @@ ggplot(exp6_m_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = fact
   scale_x_discrete(labels = c("WT", expression(italic("dorn1-1"))))+
   geom_linerange( aes(ymin = mean_root - se, ymax = mean_root + se),  width=.2,
                   position=position_dodge(.9))+
-  scale_fill_brewer(palette = "Pastel2", name = "", labels=c("0 µM ATPƴS", "7.5 µM ATPƴS"))
+  scale_fill_brewer(palette = "Pastel2", name = "", labels=c("Control", "7.5 µM ATPƴS"))
 ggsave("exp6_m_finalgrowth.png")
 ```
 
