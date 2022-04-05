@@ -19,19 +19,19 @@ theme_set(theme_classic()) # Set the theme
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 
 
-exp8_data <- read.csv("exp8_data.csv")
+exp9_data <- read.csv("exp9_data.csv")
 ```
 
 Data Manipulation
 ```{r}
 #final length
-exp8 <- exp8_data %>% 
+exp9 <- exp9_data %>% 
   mutate(ATP_conc = as.character(ATP_conc)) %>% 
-  filter(day==7, root>0) %>% 
-  mutate(ATP_conc = factor(ATP_conc, levels = c("0", "50", "100", "137.5", "200")))
+  filter(day==5, root>0) %>% 
+  mutate(ATP_conc = factor(ATP_conc, levels = c("0", "25", "50", "100")))
 
 #SE
-exp8_SE <- exp8 %>% 
+exp9_SE <- exp9 %>% 
   group_by(genotype, ATP_conc) %>% 
   summarise(mean_root = mean(root), se = sd(root)  / sqrt(n()))
 
@@ -108,16 +108,16 @@ Data Visualization
 
 
 ##Final root length
-ggplot(exp8_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +
+ggplot(exp9_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +
   geom_col(stat="identity", position = position_dodge())+
   xlab("")+ylab("average root length (mm)")+
   theme(axis.text.x=element_blank(),
         axis.ticks.x=element_blank())+
   geom_linerange( aes(ymin = mean_root - se, ymax = mean_root + se),  width=.2,
                   position=position_dodge(.9))+
-  scale_fill_brewer(palette = "Pastel2", name = "[ATP] (µM)", labels=c("Control", "50","100",
+  scale_fill_brewer(palette = "Pastel2", name = "[ATP] (µM)", labels=c("Control", "25", "50","100",
                                                              "137.5","200"))
-ggsave("exp8_finalgrowth.png")
+ggsave("exp9_finalgrowth.png")
 
 ##growth rate
 ggplot(exp8_rate_SE, aes(x = genotype, y = mean_growth.rate, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +

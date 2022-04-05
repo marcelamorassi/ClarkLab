@@ -19,25 +19,33 @@ theme_set(theme_classic()) # Set the theme
 setwd("C:/Users/Marcela Morassi/Documents/Github/ClarkLab")
 
 
-exp7 <- read.csv("data_exp7_m.csv")
+exp7_final <- read.csv("exp7_data.csv")
 ```
 
 Data Manipulation
 ```{r}
-#turning data discrete
-exp7 <- exp7 %>% 
+#final length
+exp7 <- exp7_final %>% 
   mutate(ATP_conc = as.character(ATP_conc)) %>% 
   filter(day==7, root>0) %>% 
   mutate(ATP_conc = factor(ATP_conc, levels = c("0", "5", "7.5", "10", "15", "20")))
-
-
 #SE
 exp7_SE <- exp7 %>% 
   group_by(genotype, ATP_conc) %>% 
   summarise(mean_root = mean(root), se = sd(root)  / sqrt(n()))
+
+#growth rate
+exp7_rate <- exp7_final %>% 
+  mutate(ATP_conc = as.character(ATP_conc)) %>% 
+  drop_na() %>% 
+  mutate(ATP_conc = factor(ATP_conc, levels = c("0", "5", "7.5", "10", "15", "20")))
+#growth rate SE
+exp7_rate_SE <- exp7_rate %>% 
+  group_by(genotype, ATP_conc) %>% 
+  summarise(mean_growth.rate = mean(growth.rate), se = sd(growth.rate)  / sqrt(n()))
 ```
 
-t-tests
+root length t-tests
 ```{r}
 #Marcela final root length
 #control v 5
@@ -69,6 +77,40 @@ exp7%>%
 
 ```
 
+growth rate t tests
+```{r}
+#Marcela final root length
+#control v 5
+t.test(growth.rate ~ ATP_conc, ATP_conc == 0 | ATP_conc ==5, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+#t = 1.7448, df = 154.96, p-value = 0.083
+#control v 7.5
+t.test(growth.rate ~ ATP_conc, ATP_conc == 0 | ATP_conc ==7.5, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+#t = 2.7908, df = 155.97, p-value = 0.005915
+#control v 10
+t.test(growth.rate ~ ATP_conc, ATP_conc == 0 | ATP_conc ==10, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+#t = 0.52521, df = 169.61, p-value = 0.6001
+#control v 15
+t.test(growth.rate ~ ATP_conc, ATP_conc == 0 | ATP_conc ==15, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+#t = -0.78177, df = 166, p-value = 0.4355
+#control v 20
+t.test(growth.rate ~ ATP_conc, ATP_conc == 0 | ATP_conc ==20, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+#t = 4.0107, df = 160.92, p-value = 9.247e-05
+#5 v 7.5
+t.test(growth.rate ~ ATP_conc, ATP_conc == 5 | ATP_conc ==7.5, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+#t = 1.1693, df = 155.84, p-value = 0.2441
+#5 v 20
+t.test(growth.rate ~ ATP_conc, ATP_conc == 5 | ATP_conc ==20, data = exp7_rate, var.equal=FALSE, conf.level=0.95)
+
+exp7_rate%>% 
+  select(growth.rate, ATP_conc) %>% 
+  filter(ATP_conc=="20") %>% 
+  summary()
+
+```
+
+
+
+
 Data Visualization
 ```{r}
 
@@ -85,4 +127,17 @@ ggplot(exp7_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor
   scale_fill_brewer(palette = "Pastel2", name = "[ATPƴS] (µM)", labels=c("Control", "5","7.5",
                                                              "10","15", "20"))
 ggsave("exp7_finalgrowth.png")
+
+#growth rate
+ggplot(exp7_rate_SE, aes(x = genotype, y = mean_growth.rate, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +
+  geom_col(stat="identity", position = position_dodge())+
+  xlab("")+ylab("root growth (mm/day)")+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+  geom_linerange( aes(ymin = mean_growth.rate - se, ymax = mean_growth.rate + se),  width=.2,
+                  position=position_dodge(.9))+
+  scale_fill_brewer(palette = "Pastel2", name = "[ATPƴS] (µM)", labels=c("Control", "5","7.5",
+                                                             "10","15", "20"))
+
+ggsave("exp7_growthrate.png")
 ```
