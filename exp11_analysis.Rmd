@@ -54,8 +54,8 @@ t.test(root ~ ATP_conc, genotype=="OX", data = exp11, var.equal=FALSE, conf.leve
 #t = 5.4108, df = 22.447, p-value = 1.834e-05
 
 exp11 %>% 
-  select(root, ATP_conc) %>% 
-  filter(ATP_conc=="137.5") %>% 
+  select(root, ATP_conc, genotype) %>%
+  filter(genotype == "OX", ATP_conc=="10") %>% 
   summary()
 
 

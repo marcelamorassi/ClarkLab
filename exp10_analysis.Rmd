@@ -27,13 +27,13 @@ Data Manipulation
 exp10 <- exp10 %>% 
   mutate(ATP_conc = as.character(ATP_conc)) %>% 
   filter(day==5, root>0) %>% 
-  mutate(genotype = factor(ATP_conc, levels = c("0", "0.5", "1", "2", "10", "20")))
+  mutate(ATP_conc = factor(ATP_conc, levels = c("0", "0.5", "1", "2", "10", "20")))
 
 
 #SE
 exp10_SE <- exp10 %>% 
   mutate(ATP_conc = as.character(ATP_conc)) %>%
-  group_by(genotype, ATP_conc) %>% 
+  group_by(ATP_conc) %>% 
   summarise(mean_root = mean(root), se = sd(root)  / sqrt(n()))
 ```
 
@@ -68,7 +68,7 @@ Data Visualization
 
 ##Final root length
 #Marcela
-ggplot(exp10_SE, aes(x = genotype, y = mean_root, fill = ATP_conc, group = factor (ATP_conc)), col=palette) +
+ggplot(exp10_SE, aes(x = ATP_conc, y = mean_root, fill = ATP_conc, group = factor (ATP_conc)),  col=palette) +
   geom_col(stat="identity", position = position_dodge())+
   xlab("")+ylab("average root length (mm)")+
   scale_x_discrete(labels = c("", expression(italic(""))))+

@@ -27,7 +27,7 @@ Data Manipulation
 exp9 <- exp9 %>% 
   mutate(ATP_conc = as.character(ATP_conc)) %>% 
   filter(day==5, root>0) %>% 
-  mutate(genotype = factor(genotype, levels = c("WT", "KO")))
+  mutate(ATP_conc = factor(ATP_conc, levels = c("0", "25", "50", "100", "137.5", "200")))
 
 
 #SE
@@ -40,6 +40,9 @@ exp9_SE <- exp9 %>%
 t-tests
 ```{r}
 #Marcela final root length
+#control v 20
+t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc ==25, data = exp9, var.equal=FALSE, conf.level=0.95)
+#t = 6.3173, df = 37.913, p-value = 2.112e-07
 #control v 50
 t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc ==50, data = exp9, var.equal=FALSE, conf.level=0.95)
 #t = 4.1074, df = 36.385, p-value = 0.000217
@@ -52,10 +55,10 @@ t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc ==137.5, data = exp9, var.equal
 #control v 150
 t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc ==200, data = exp9, var.equal=FALSE, conf.level=0.95)
 #t = 10.957, df = 38.314, p-value = 2.276e-13
-a
-#control v 20
-t.test(root ~ ATP_conc, ATP_conc == 0 | ATP_conc ==25, data = exp9, var.equal=FALSE, conf.level=0.95)
-#t = 6.3173, df = 37.913, p-value = 2.112e-07
+
+t.test(root ~ ATP_conc, ATP_conc == 137.5 | ATP_conc ==200, data = exp9, var.equal=FALSE, conf.level=0.95)
+#t = 10.957, df = 38.314, p-value = 2.276e-13
+
 
 exp9 %>% 
   select(root, ATP_conc) %>% 
